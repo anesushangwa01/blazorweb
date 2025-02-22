@@ -1,0 +1,37 @@
+@page "/logout"
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Logout</PageTitle>
+
+<article>
+    <p class="text-logout">You've succesfully logged out of the app</p>
+    <button class="btn login-btn" type="button">
+        <NavLink href="login" Match="NavLinkMatch.All">
+            Login
+        </NavLink>
+    </button>
+</article>
+
+@code {
+    /// <summary>
+    /// The HTTP context parameter that allows access to the current HTTP request.
+    /// </summary>
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    /// <summary>
+    /// Performs the necessary actions on initialization, including logging out if the user is authenticated.
+    /// </summary>
+    /// <returns>Task representing the asynchronous operation.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        // Checks if the user is authenticated and signs out if true
+        if (HttpContext!.User!.Identity!.IsAuthenticated)
+        {
+            await AuthService.SignOutAsync(); // Calls the SignOut method from the AuthService
+            NavigationManager.NavigateTo("/logout", true); // Navigates to the logout page after sign-out
+        }
+    }
+}

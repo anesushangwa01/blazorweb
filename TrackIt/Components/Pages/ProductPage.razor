@@ -1,0 +1,128 @@
+@page "/products"
+@using TrackIt.Models
+@using TrackIt.Services
+@rendermode InteractiveServer
+@inject ProductService PS
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<PageTitle>Products</PageTitle>
+
+<div class="container">
+    <h1>Items</h1>
+    <div class="search-container">
+        <input type="text" placeholder="Search..." @bind="search" />
+        <button class="btn-search" @onclick="Search">Search</button>
+        <button class="btn-change-view" @onclick=ChangeView>Change View</button>
+        <NavLink class="btn-add" href="/add-item">Add New Item</NavLink>
+    </div>
+
+</div>
+<hr>
+
+<div>
+    <table class="@table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Product products in Products)
+            {
+                <tr>
+                    <td>@products.Name</td>
+                    <td>$@products.Price</td>
+                    <td>@products.StockQuantity</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2"
+                            @onclick="() => NavigateToUpdate(products)">Edit</button>
+                        <button class="btn btn-danger btn-sm me-2"
+                            @onclick="() => NavigateToDelete(products)">Delete</button>
+                        <a href="/product-details/@products.Id" class="btn btn-primary btn-sm">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div id="cards" class="@card">
+        @foreach (Product products in Products)
+        {
+            <div class="@card">
+                <a href="/product-details/@products.Id">
+                    <img src="@products.ImgUrl" alt="@products.Name image">
+                </a>
+                <h2>@products.Name</h2>
+                <p>$@products.Price</p>
+                <p>@products.StockQuantity</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// List of Products from the database
+    /// </summary>
+    private List<Product> Products = new List<Product>();
+    /// <summary>
+    /// Stores user input as a string
+    /// </summary>
+    private string? search { get; set; }
+    /// <summary>
+    /// Controls the css class for the table element
+    /// </summary>
+    private string table = "";
+    /// <summary>
+    /// Controls the css class for the card elements
+    /// </summary>
+    private string card = "hidden";
+    /// <summary>
+    /// Gets the initial list of Products from the database
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        Products = await PS.Index();
+    }
+    /// <summary>
+    /// Replaces the list of Products with a filtered list
+    /// </summary>
+    private async void Search()
+    {
+        Products = await PS.Index(search);
+    }
+    /// <summary>
+    /// Swaps the value of the card and table elements, hiding one and revealing the other
+    /// </summary>
+    private void ChangeView()
+    {
+        if (card == "hidden")
+        {
+            card = "";
+            table = "hidden";
+        }
+        else
+        {
+            card = "hidden";
+            table = "";
+        }
+    }
+    /// <summary>
+    /// A button to navigate to the EditItem page
+    /// </summary>
+    private void NavigateToUpdate(Product product)
+    {
+        Navigation.NavigateTo($"/edit-item/{product.Id}");
+    }
+    /// <summary>
+    /// A button to navigate to the DeleteItem page
+    /// </summary>
+    private void NavigateToDelete(Product product)
+    {
+        Navigation.NavigateTo($"/delete-item/{product.Id}");
+    }
+}

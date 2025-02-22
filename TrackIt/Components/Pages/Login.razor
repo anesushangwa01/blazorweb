@@ -1,0 +1,69 @@
+@page "/login"
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+@inject IAuthService AuthService
+
+<PageTitle>Login</PageTitle>
+
+<div class="container custom-container">
+    <h2 class="title-form">Login</h2>
+    <div class="card p-4 shadow-sm custom-card">
+        <EditForm method="post" Model="@User" OnValidSubmit="HandleLogin" FormName="LogIn">
+            <div class="form-group mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <InputText id="Email" type="email" @bind-Value="User.Username" class="form-control"
+                    aria-placeholder="example@gmail.com" placeholder="example@gmail.com" />
+                <ValidationMessage For="@(() => User.Username)" class="text-danger" />
+            </div>
+            <div class="form-group mb-3">
+                <label for="Password" class="form-label">Password</label>
+                <InputText id="Password" type="password" @bind-Value="User.Password" class="form-control" />
+                <ValidationMessage For="@(() => User.Password)" class="text-danger" />
+            </div>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-success login-btn">Login</button>
+            </div>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+            <!-- DataAnnotationsValidator to trigger validation based on data annotations -->
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger validation-msg" />
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// The user model used for binding to the form during login.
+    /// </summary>
+    [SupplyParameterFromForm]
+    public User User { get; set; } = new User();
+
+    /// <summary>
+    /// Holds any error message that will be displayed if login fails.
+    /// </summary>
+    private string? errorMessage;
+
+    /// <summary>
+    /// Handles the form submission, attempts to authenticate the user, and handles errors.
+    /// </summary>
+    /// <returns>Task representing the asynchronous operation.</returns>
+    public async Task HandleLogin()
+    {
+        errorMessage = null;
+
+        // Calls the IAuthService to authenticate the user with the provided credentials.
+        bool isAuthenticated = await AuthService.SignInAsync(User.Username, User.Password);
+
+        if (!isAuthenticated)
+        {
+            errorMessage = "Invalid username or password";
+            return;
+        }
+
+        // Navigate to the home page after successful authentication
+        NavigationManager.NavigateTo("/");
+    }
+}

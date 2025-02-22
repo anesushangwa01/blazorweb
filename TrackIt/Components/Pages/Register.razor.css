@@ -1,0 +1,29 @@
+.custom-container {
+  max-width: 400px;
+}
+
+.signin-btn {
+  width: 100%;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.signin-btn:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.custom-card {
+  background-color: var(--bg-component-color);
+  border-color: var(--border-component-color);
+}
+
+::deep ul.validation-msg {
+  padding-left: 0 !important;
+  list-style: none !important;
+  margin-bottom: 0;
+}
+
+.title-form {
+  font-family: var(--title-font);
+}

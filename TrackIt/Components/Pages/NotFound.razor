@@ -1,0 +1,56 @@
+﻿@page "/{*route:nonfile}"
+@inject NavigationManager NavigationManager
+@using System.Timers
+@rendermode InteractiveServer
+
+<PageTitle>Page not found</PageTitle>
+
+<h1 class="text-danger">Page not found</h1>
+<p class="text-danger">The page @Route you are looking for does not exist.</p>
+<p>You will be redirected to the home page in @countdown seconds...</p>
+
+@code {
+    /// <summary>
+    /// The Route parameter captures the undefined route that was attempted to be accessed.
+    /// </summary>
+    [Parameter]
+    public string? Route { get; set; }
+    private int countdown = 5;
+    private Timer timer;
+
+    /// <summary>
+    /// Initializes the timer when the component is first rendered.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        timer = new Timer(1000);
+        timer.Elapsed += OnTimerElapsed;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+
+    /// <summary>
+    /// This method is called every time the timer elapses (every second).
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">Event data.</param>
+    private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+    {
+        countdown--;
+        if (countdown == 0)
+        {
+            timer.Stop();
+            NavigationManager.NavigateTo("/");
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Dispose of the timer when the component is destroyed to free up resources.
+    /// </summary>
+    public void Dispose()
+    {
+        timer?.Stop();
+        timer?.Dispose();
+    }
+}

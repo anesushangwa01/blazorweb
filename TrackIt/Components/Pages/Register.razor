@@ -1,0 +1,85 @@
+@page "/register"
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+@inject IAuthService AuthService
+
+<PageTitle>Register</PageTitle>
+
+<div class="container custom-container">
+    <h2 class="title-form">Register</h2>
+    <div>
+        <ul>
+            <li>Please register with your email</li>
+            <li>Your password must be at least 8 characters long and at must 20 characters long</li>
+        </ul>
+    </div>
+    <div class="card p-4 shadow-sm custom-card">
+        <EditForm method="post" Model="@User" OnValidSubmit="HandleRegister" FormName="SignIn">
+            <div class="form-group mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <InputText id="Email" type="email" @bind-Value="User.Username" class="form-control"
+                    aria-placeholder="example@gmail.com" placeholder="example@gmail.com" />
+                <ValidationMessage For="@(() => User.Username)" class="text-danger" />
+            </div>
+            <div class="form-group mb-3">
+                <label for="Password" class="form-label">Password</label>
+                <InputText id="Password" type="password" @bind-Value="User.Password" class="form-control" />
+                <ValidationMessage For="@(() => User.Password)" class="text-danger" />
+            </div>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-success signin-btn">Register</button>
+            </div>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger">@errorMessage</div>
+            }
+            <!-- DataAnnotationsValidator to trigger validation based on data annotations -->
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger validation-msg" />
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// The user model used for registration and binding to the form.
+    /// </summary>
+    [SupplyParameterFromForm]
+    public User User { get; set; } = new User();
+
+    /// <summary>
+    /// Holds any error message that will be displayed if registration fails.
+    /// </summary>
+    private string? errorMessage;
+
+    /// <summary>
+    /// Handles the form submission, registers the user, and handles authentication.
+    /// </summary>
+    /// <returns>Task representing the asynchronous operation.</returns>
+    public async Task HandleRegister()
+    {
+        errorMessage = null;
+
+        // Calls the user service to register the user and returns true if the user is successfully registered
+        bool success = await UserService.RegisterUser(User);
+
+        if (!success)
+        {
+            errorMessage = "User already exists";
+            return;
+        }
+
+        // Calls the authentication service to sign in the user after succesful registration and returns true if
+        // the user is successfully authenticated
+        bool isAuthenticated = await AuthService.SignInAsync(User.Username, User.Password);
+
+        if (!isAuthenticated)
+        {
+            errorMessage = "Invalid username or password";
+            return;
+        }
+
+        // Navigates to the homepage upon successful registration and authentication
+        NavigationManager.NavigateTo("/");
+    }
+}

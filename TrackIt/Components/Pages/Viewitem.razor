@@ -1,0 +1,77 @@
+@page "/product-details/{productId:int}"
+@inject ProductService ProductService
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>Product Details</PageTitle>
+
+<div class="container">
+
+    @if (product == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <h5> @product.Name</h5>
+        <hr />
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="@product.ImgUrl" alt="@product.Name Image"
+                        style="max-width: 100%; height: auto; object-fit: cover;" class="rounded-start"> @* Image with rounded corners *@
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">Price: @product.FormattedPrice()</p>
+                        <p class="card-text">Stock: @product.StockQuantity @(product.StockQuantity > 1 ? "boxes" : "box")
+                        </p>
+                        @* Add other details here *@
+                        <button class="btn btn-warning btn-sm me-2" @onclick="() => NavigateToUpdate(product)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => NavigateToDelete(product)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// The ID of the product to display from the parameter route.
+    /// </summary>
+    [Parameter]
+    public int productId { get; set; }
+
+    /// <summary>
+    /// The product to display.
+    /// </summary>
+    private Product product;
+
+    /// <summary>
+    /// Initializes the component retrieving the product from the db using the Id parameter.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        product = await ProductService.GetProductById(productId) ?? new Product();
+    }
+
+    /// <summary>
+    /// Navigates to the update page for the product.
+    /// </summary>
+    private void NavigateToUpdate(Product product)
+    {
+        Navigation.NavigateTo($"/edit-item/{product.Id}");
+    }
+
+    /// <summary>
+    /// Navigates to the delete page for the product.
+    /// </summary>
+    private void NavigateToDelete(Product product)
+    {
+        Navigation.NavigateTo($"/delete-item/{product.Id}");
+    }
+}

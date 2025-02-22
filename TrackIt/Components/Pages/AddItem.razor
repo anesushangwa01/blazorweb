@@ -1,0 +1,81 @@
+@page "/add-item"
+@using Microsoft.AspNetCore.Authorization
+@inject ProductService ProductService
+@inject CategoryService CategoryService
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>Add Item</PageTitle>
+
+<h2>Add items</h2>
+<hr />
+
+<div class="container">
+    <div class="card p-4 shadow-sm">
+        <EditForm method="post" Model="Product" OnValidSubmit="SubmitForm" FormName="AddItem">
+            <div class="mb-3">
+                <label class="form-label" for="ImgUrl">Product img url</label>
+                <InputText class="form-control" @bind-Value="Product.ImgUrl" id="ImgUrl" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="category">Category</label>
+                <select class="form-control" @bind="Product.CategoryId" id="category">
+                    <option value="">Select a category</option>
+                    @foreach (var category in Categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="product-name">Product name</label>
+                <InputText class="form-control" @bind-Value="Product.Name" id="product-name" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="stock-qty">Stock Quantity</label>
+                <InputNumber class="form-control" @bind-Value="Product.StockQuantity" min="1" id="stock-qty" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="price">Price</label>
+                <InputNumber class="form-control" @bind-Value="Product.Price" step="0.01" min="0.01" id="price" />
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">SUBMIT</button>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// Product object to store form data
+    /// </summary>
+    private Product Product = new Product();
+
+    /// <summary>
+    /// List of categories to populate the dropdown
+    /// </summary>
+    private List<Category> Categories = new List<Category>();
+
+    /// <summary>
+    /// Fetch all categories from the database to populate the dropdown
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await CategoryService.GetAllCategories();
+    }
+
+    /// <summary>
+    /// Submit the form data to the database and set the form to its initial state
+    /// </summary>
+    private async Task SubmitForm()
+    {
+        await ProductService.AddProduct(Product);
+        Product = new Product(); // Reset form after submission
+    }
+}

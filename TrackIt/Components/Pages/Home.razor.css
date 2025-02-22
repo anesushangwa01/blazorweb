@@ -1,0 +1,24 @@
+h1 {
+    font-family: var(--title-font);
+    font-size: 2.5rem;
+    margin-top: 50px;
+    /* Space from the top edge */
+    margin-bottom: 20px;
+    /* Space below the h1 */
+    text-align: center;
+    /* Center the title */
+}
+
+p {
+    font-family: var(--text-font);
+    font-size: 1.25rem;
+    line-height: 1.5;
+    text-align: center;
+    /* Center the paragraph */
+    max-width: 800px;
+    /* Max width for readability */
+    margin: 0 auto;
+    /* Center the paragraph */
+    padding: 0 20px;
+    /* Add some padding for smaller screens */
+}

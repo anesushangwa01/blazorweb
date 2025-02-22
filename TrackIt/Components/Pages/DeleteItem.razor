@@ -1,0 +1,84 @@
+@page "/delete-item/{id:int}"
+@inject ProductService ProductService
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>Delete Item @product.Name</PageTitle>
+
+<h2>Delete Item</h2>
+<hr />
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    /// Displays an error message if an exception or invalid state occurs
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    /// Displays the product details and delete button
+    <div class="container">
+        <div class="card p-4 shadow-sm">
+            <h5>Are you sure you want to delete the following item?</h5>
+            <p><strong>Name:</strong> @product.Name</p>
+            <p><strong>Category:</strong> @product.Category.Name</p>
+            <p><strong>Stock:</strong> @product.StockQuantity</p>
+            <p><strong>Price:</strong> @product.Price</p>
+
+            <button class="btn btn-danger w-100" @onclick="DeleteProduct">Delete</button>
+            <button class="btn btn-secondary w-100 mt-2" @onclick="Cancel">Cancel</button>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// The ID parameter representing the product ID from the route.
+    /// </summary>
+    [Parameter] public int Id { get; set; }
+
+    private Product product = new Product();
+
+    /// <summary>
+    /// The error message to display if an exception occurs.
+    /// </summary>
+    private string? errorMessage;
+
+    /// <summary>
+    /// Initializes the component by fetching the product details.
+    /// If the product is not found, an error message is displayed.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            product = await ProductService.GetProductById(Id);
+            if (product == null)
+            {
+                errorMessage = "Product not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    /// <summary>
+    /// Deletes the product from the database and navigates back to the products page.
+    /// </summary>
+    private async void DeleteProduct()
+    {
+        await ProductService.DeleteProduct(product.Id);
+        NavigationManager.NavigateTo("/products");
+    }
+
+    /// <summary>
+    /// Cancels the deletion and navigates back to the products page.
+    /// </summary>
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+}

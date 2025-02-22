@@ -1,0 +1,188 @@
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2.5rem;
+    gap: 1rem;
+    font-size: 18px;
+}
+
+.container input {
+    width: 100%;
+    max-width: 300px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.change-view {
+    width: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Center table container */
+.table-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Center the table and adjust its width */
+table {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Centers the table horizontally */
+    border-collapse: collapse;
+}
+
+/* Center align text inside table */
+th,
+td {
+    text-align: center;
+    font-size: 18px;
+    padding: 10px;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+        /* Allows horizontal scrolling if needed */
+    }
+
+    table {
+        width: 100%;
+        /* Ensures full-width on smaller screens */
+    }
+
+    th,
+    td {
+        font-size: 18px;
+        padding: 8px;
+    }
+}
+
+/* Card Layout */
+#cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 20px;
+    font-size: 18px;
+}
+
+#cards div {
+    border: 1px solid black;
+    padding: 16px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+#cards img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Ensure buttons have a consistent size */
+.btn {
+    font-size: 16px;
+    padding: 10px 15px;
+    border-radius: 8px;
+}
+
+/* Ensure proper spacing between buttons */
+.btn-sm {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .container input,
+    .container button {
+        width: 100%;
+    }
+
+    #cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Search Bar and Buttons */
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.search-container input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    max-width: 300px;
+}
+
+.search-container button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-container button:hover {
+    transform: scale(1.05);
+}
+
+/* Search Button */
+.search-container .btn-search {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.search-container .btn-search:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Add Item Button */
+.search-container .btn-add {
+    background-color: #0052CC;
+    color: white;
+}
+
+.search-container .btn-add:hover {
+    background-color: #003d99;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .search-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-container input {
+        width: 100%;
+    }
+
+    .search-container button {
+        width: 100%;
+    }
+}

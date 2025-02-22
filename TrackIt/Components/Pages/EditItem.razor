@@ -1,0 +1,112 @@
+@page "/edit-item/{id:int}"
+@inject ProductService ProductService
+@inject CategoryService CategoryService
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>Edit Item @Product.Name</PageTitle>
+
+<h2>Update Item</h2>
+<hr />
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    /// Displays an error message if an exception or invalid state occurs
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    /// Displays the product details and the update button
+    <div class="container">
+        <div class="card p-4 shadow-sm">
+            <EditForm Model="Product" OnValidSubmit="UpdateProduct">
+                <AntiforgeryToken />
+                <div class="mb-3">
+                    <label class="form-label" for="ImgUrl">Product Image URL</label>
+                    <InputText class="form-control" @bind-Value="Product.ImgUrl" id="ImgUrl" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="category">Category</label>
+                    <select class="form-select" @bind="Product.CategoryId" id="category">
+                        <option value="">Select a category</option>
+                        @foreach (var category in Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="product-name">Product Name</label>
+                    <InputText class="form-control" @bind-Value="Product.Name" id="product-name" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="stock-qty">Stock</label>
+                    <InputNumber class="form-control" @bind-Value="Product.StockQuantity" id="stock-qty" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="price">Price</label>
+                    <InputNumber class="form-control" @bind-Value="Product.Price" step="0.01" min="0.01" id="price" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Update</button>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger validation-msg" />
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// The ID parameter representing the product ID from the route.
+    /// </summary>
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Product Product { get; set; } = new Product();
+
+    /// <summary>
+    /// The list of categories to populate the dropdown list.
+    /// </summary>
+    private List<Category> Categories = new List<Category>();
+
+    /// <summary>
+    /// The error message to display if an exception occurs.
+    /// </summary>
+    private string? errorMessage;
+
+    /// <summary>
+    /// Updates the product details in the database and navigates to the products page.
+    /// </summary>
+    private async Task UpdateProduct()
+    {
+        await ProductService.UpdateProduct(Product);
+        NavigationManager.NavigateTo("/products");
+    }
+
+    /// <summary>
+    /// Initializes the component by fetching the product details and categories.
+    /// If the product is not found, an error message is displayed.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            Product = await ProductService.GetProductById(Id) ?? new Product();
+            Categories = await CategoryService.GetAllCategories() ?? new List<Category>();
+
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}
